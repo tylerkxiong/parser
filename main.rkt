@@ -3,9 +3,15 @@
 (require (prefix-in : parser-tools/lex-sre))
 
 (define error-line-number 0)
+(define y 0)
 
 (define scan
   (lexer
+   [#\newline
+    ; =>
+    (begin
+      (set! y( add1 y))
+      (scan input-port))]
    ["write"
     ; =>
     (cons '"write"
@@ -197,12 +203,22 @@
   (set! x 0)
   (define lst (scan (open-input-file input)))
   (define l (stmt-list lst))
-  (define y 0)
   (cond
     [(equal? l lst)
-     "Accept"]
+     (display "Accept \n\n")]
     [else
-     (string-append "Syntax error found on line " (~a error-line-number))])
+     (display (string-append "Syntax error found on line " (~a error-line-number) "\n"))
+     (define x 0)
+     (with-input-from-file (~a input)
+       (thunk 
+        (for ([line (in-lines)])
+          (set! x(add1 x))
+          (cond
+            [(= x error-line-number)
+             (displayln line)])
+          )
+        ))
+     (display "\n")])
   )
  
 (parse "input01.txt")
