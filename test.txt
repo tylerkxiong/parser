@@ -1,10 +1,4 @@
-write (3)
-read f
-read v
-s := a
-read f
-read f
-read fdsfsd
-read fdse
-read 3ed
+write s
+sdsds := fd * ( s)
+read a6
 $$

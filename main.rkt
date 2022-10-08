@@ -3,15 +3,9 @@
 (require (prefix-in : parser-tools/lex-sre))
 
 (define error-line-number 0)
-(define y 0)
 
 (define scan
   (lexer
-   [#\newline
-    ; =>
-    (begin
-      (set! y( add1 y))
-      (scan input-port))]
    ["write"
     ; =>
     (cons '"write"
@@ -73,7 +67,7 @@
     [(or (string=? (car lst) "id")
          (string=? (car lst) "read")
          (string=? (car lst) "write"))
-     (stmt-list (program lst))]
+     (stmt-list lst)]
     [(string=? (car lst) "$$")
      lst]
     [else
@@ -114,6 +108,7 @@
     [(string=? (car lst) ":=")
      (cons (car lst) (expr (rest lst)))]
     [else
+     (set! error-line-number(sub1 error-line-number))
      "error in id"]))
 
 (define (expr lst)
@@ -202,7 +197,7 @@
   (set! error-line-number 0)
   (set! x 0)
   (define lst (scan (open-input-file input)))
-  (define l (stmt-list lst))
+  (define l (program lst))
   (cond
     [(equal? l lst)
      (display "Accept \n\n")]
